@@ -1,0 +1,278 @@
+
+R version 4.0.2 (2020-06-22) -- "Taking Off Again"
+Copyright (C) 2020 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(arulesViz)
+Loading required package: arules
+Loading required package: Matrix
+
+Attaching package: ‘arules’
+
+The following objects are masked from ‘package:base’:
+
+    abbreviate, write
+
+Loading required package: grid
+Registered S3 method overwritten by 'seriation':
+  method         from 
+  reorder.hclust gclus
+> library(arules)
+> groceries <- read.transactions("C:\\Users\\chris\\DMAssignment5\\dataset\\Market_Basket_Optimisation.csv", format='basket', sep=',')
+Warning message:
+In asMethod(object) : removing duplicated items in transactions
+> groceries
+transactions in sparse format with
+ 7501 transactions (rows) and
+ 119 items (columns)
+> summary(groceries)
+transactions as itemMatrix in sparse format with
+ 7501 rows (elements/itemsets/transactions) and
+ 119 columns (items) and a density of 0.03288973 
+
+most frequent items:
+mineral water          eggs     spaghetti  french fries     chocolate       (Other) 
+         1788          1348          1306          1282          1229         22405 
+
+element (itemset/transaction) length distribution:
+sizes
+   1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   18   19   20 
+1754 1358 1044  816  667  493  391  324  259  139  102   67   40   22   17    4    1    2    1 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.000   2.000   3.000   3.914   5.000  20.000 
+
+includes extended item information - examples:
+             labels
+1           almonds
+2 antioxydant juice
+3         asparagus
+> 
+> aprioriFirstAttempt <- apriori(groceries,parameter = list(supp=0.01, conf=0.20, target = "rules", maxlen = 2))
+Apriori
+
+Parameter specification:
+ confidence minval smax arem  aval originalSupport maxtime support minlen maxlen target  ext
+        0.2    0.1    1 none FALSE            TRUE       5    0.01      1      2  rules TRUE
+
+Algorithmic control:
+ filter tree heap memopt load sort verbose
+    0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+
+Absolute minimum support count: 75 
+
+set item appearances ...[0 item(s)] done [0.00s].
+set transactions ...[119 item(s), 7501 transaction(s)] done [0.00s].
+sorting and recoding items ... [75 item(s)] done [0.00s].
+creating transaction tree ... done [0.00s].
+checking subsets of size 1 2 done [0.00s].
+writing ... [117 rule(s)] done [0.00s].
+creating S4 object  ... done [0.00s].
+Warning message:
+In apriori(groceries, parameter = list(supp = 0.01, conf = 0.2,  :
+  Mining stopped (maxlen reached). Only patterns up to a length of 2 returned!
+> summary(aprioriFirstAttempt)
+set of 117 rules
+
+rule length distribution (lhs + rhs):sizes
+  1   2 
+  1 116 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.000   2.000   2.000   1.991   2.000   2.000 
+
+summary of quality measures:
+    support          confidence        coverage            lift            count       
+ Min.   :0.01013   Min.   :0.2000   Min.   :0.02573   Min.   :0.9025   Min.   :  76.0  
+ 1st Qu.:0.01506   1st Qu.:0.2204   1st Qu.:0.05853   1st Qu.:1.2881   1st Qu.: 113.0  
+ Median :0.01946   Median :0.2467   Median :0.07146   Median :1.4599   Median : 146.0  
+ Mean   :0.02496   Mean   :0.2692   Mean   :0.09753   Mean   :1.5304   Mean   : 187.2  
+ 3rd Qu.:0.02853   3rd Qu.:0.3155   3rd Qu.:0.09825   3rd Qu.:1.6789   3rd Qu.: 214.0  
+ Max.   :0.23837   Max.   :0.4565   Max.   :1.00000   Max.   :3.2920   Max.   :1788.0  
+
+mining info:
+      data ntransactions support confidence
+ groceries          7501    0.01        0.2
+> inspect(aprioriFirstAttempt)
+      lhs                    rhs                 support    confidence coverage   lift      count
+[1]   {}                  => {mineral water}     0.23836822 0.2383682  1.00000000 1.0000000 1788 
+[2]   {cereals}           => {mineral water}     0.01026530 0.3989637  0.02572990 1.6737287   77 
+[3]   {red wine}          => {spaghetti}         0.01026530 0.3649289  0.02812958 2.0959661   77 
+[4]   {red wine}          => {mineral water}     0.01093188 0.3886256  0.02812958 1.6303583   82 
+[5]   {champagne}         => {chocolate}         0.01159845 0.2478632  0.04679376 1.5127927   87 
+[6]   {avocado}           => {mineral water}     0.01159845 0.3480000  0.03332889 1.4599262   87 
+[7]   {fresh bread}       => {mineral water}     0.01333156 0.3095975  0.04306093 1.2988205  100 
+[8]   {salmon}            => {chocolate}         0.01066524 0.2507837  0.04252766 1.5306172   80 
+[9]   {salmon}            => {spaghetti}         0.01346487 0.3166144  0.04252766 1.8184723  101 
+[10]  {salmon}            => {mineral water}     0.01706439 0.4012539  0.04252766 1.6833365  128 
+[11]  {honey}             => {spaghetti}         0.01186508 0.2500000  0.04746034 1.4358729   89 
+[12]  {honey}             => {mineral water}     0.01506466 0.3174157  0.04746034 1.3316193  113 
+[13]  {herb & pepper}     => {ground beef}       0.01599787 0.3234501  0.04946007 3.2919938  120 
+[14]  {herb & pepper}     => {eggs}              0.01253166 0.2533693  0.04946007 1.4098835   94 
+[15]  {herb & pepper}     => {spaghetti}         0.01626450 0.3288410  0.04946007 1.8886953  122 
+[16]  {herb & pepper}     => {mineral water}     0.01706439 0.3450135  0.04946007 1.4473971  128 
+[17]  {grated cheese}     => {ground beef}       0.01133182 0.2162850  0.05239301 2.2012940   85 
+[18]  {grated cheese}     => {chocolate}         0.01093188 0.2086514  0.05239301 1.2734696   82 
+[19]  {grated cheese}     => {spaghetti}         0.01653113 0.3155216  0.05239301 1.8121958  124 
+[20]  {grated cheese}     => {mineral water}     0.01746434 0.3333333  0.05239301 1.3983967  131 
+[21]  {soup}              => {milk}              0.01519797 0.3007916  0.05052660 2.3212320  114 
+[22]  {soup}              => {chocolate}         0.01013198 0.2005277  0.05052660 1.2238880   76 
+[23]  {soup}              => {spaghetti}         0.01426476 0.2823219  0.05052660 1.6215135  107 
+[24]  {soup}              => {mineral water}     0.02306359 0.4564644  0.05052660 1.9149549  173 
+[25]  {cooking oil}       => {milk}              0.01146514 0.2245431  0.05105986 1.7328165   86 
+[26]  {cooking oil}       => {chocolate}         0.01359819 0.2663185  0.05105986 1.6254315  102 
+[27]  {cooking oil}       => {eggs}              0.01173177 0.2297650  0.05105986 1.2785366   88 
+[28]  {cooking oil}       => {spaghetti}         0.01586455 0.3107050  0.05105986 1.7845313  119 
+[29]  {cooking oil}       => {mineral water}     0.02013065 0.3942559  0.05105986 1.6539784  151 
+[30]  {whole wheat rice}  => {milk}              0.01186508 0.2027335  0.05852553 1.5645102   89 
+[31]  {whole wheat rice}  => {chocolate}         0.01199840 0.2050114  0.05852553 1.2512534   90 
+[32]  {whole wheat rice}  => {spaghetti}         0.01413145 0.2414579  0.05852553 1.3868112  106 
+[33]  {whole wheat rice}  => {mineral water}     0.02013065 0.3439636  0.05852553 1.4429925  151 
+[34]  {escalope}          => {french fries}      0.01639781 0.2067227  0.07932276 1.2095374  123 
+[35]  {escalope}          => {chocolate}         0.01759765 0.2218487  0.07932276 1.3540174  132 
+[36]  {escalope}          => {mineral water}     0.01706439 0.2151261  0.07932276 0.9024947  128 
+[37]  {turkey}            => {eggs}              0.01946407 0.3113006  0.06252500 1.7322449  146 
+[38]  {turkey}            => {spaghetti}         0.01653113 0.2643923  0.06252500 1.5185351  124 
+[39]  {turkey}            => {mineral water}     0.01919744 0.3070362  0.06252500 1.2880754  144 
+[40]  {chicken}           => {milk}              0.01479803 0.2466667  0.05999200 1.9035460  111 
+[41]  {chicken}           => {chocolate}         0.01466471 0.2444444  0.05999200 1.4919266  110 
+[42]  {chicken}           => {eggs}              0.01439808 0.2400000  0.05999200 1.3354896  108 
+[43]  {chicken}           => {spaghetti}         0.01719771 0.2866667  0.05999200 1.6464676  129 
+[44]  {chicken}           => {mineral water}     0.02279696 0.3800000  0.05999200 1.5941723  171 
+[45]  {frozen smoothie}   => {milk}              0.01426476 0.2252632  0.06332489 1.7383734  107 
+[46]  {frozen smoothie}   => {french fries}      0.01453140 0.2294737  0.06332489 1.3426537  109 
+[47]  {frozen smoothie}   => {chocolate}         0.01493134 0.2357895  0.06332489 1.4391024  112 
+[48]  {frozen smoothie}   => {spaghetti}         0.01559792 0.2463158  0.06332489 1.4147127  117 
+[49]  {frozen smoothie}   => {mineral water}     0.02026396 0.3200000  0.06332489 1.3424609  152 
+[50]  {low fat yogurt}    => {eggs}              0.01679776 0.2195122  0.07652313 1.2214844  126 
+[51]  {low fat yogurt}    => {mineral water}     0.02399680 0.3135889  0.07652313 1.3155649  180 
+[52]  {tomatoes}          => {frozen vegetables} 0.01613118 0.2358674  0.06839088 2.4744639  121 
+[53]  {tomatoes}          => {milk}              0.01399813 0.2046784  0.06839088 1.5795189  105 
+[54]  {tomatoes}          => {chocolate}         0.01399813 0.2046784  0.06839088 1.2492208  105 
+[55]  {tomatoes}          => {spaghetti}         0.02093054 0.3060429  0.06839088 1.7577547  157 
+[56]  {tomatoes}          => {mineral water}     0.02439675 0.3567251  0.06839088 1.4965298  183 
+[57]  {olive oil}         => {ground beef}       0.01413145 0.2145749  0.06585789 2.1838892  106 
+[58]  {olive oil}         => {milk}              0.01706439 0.2591093  0.06585789 1.9995668  128 
+[59]  {olive oil}         => {chocolate}         0.01639781 0.2489879  0.06585789 1.5196565  123 
+[60]  {olive oil}         => {spaghetti}         0.02293028 0.3481781  0.06585789 1.9997582  172 
+[61]  {olive oil}         => {mineral water}     0.02759632 0.4190283  0.06585789 1.7579036  207 
+[62]  {shrimp}            => {frozen vegetables} 0.01666444 0.2332090  0.07145714 2.4465739  125 
+[63]  {shrimp}            => {milk}              0.01759765 0.2462687  0.07145714 1.9004745  132 
+[64]  {shrimp}            => {chocolate}         0.01799760 0.2518657  0.07145714 1.5372208  135 
+[65]  {shrimp}            => {spaghetti}         0.02119717 0.2966418  0.07145714 1.7037596  159 
+[66]  {shrimp}            => {mineral water}     0.02359685 0.3302239  0.07145714 1.3853520  177 
+[67]  {cake}              => {french fries}      0.01786428 0.2203947  0.08105586 1.2895327  134 
+[68]  {cake}              => {eggs}              0.01906412 0.2351974  0.08105586 1.3087652  143 
+[69]  {cake}              => {spaghetti}         0.01813092 0.2236842  0.08105586 1.2847284  136 
+[70]  {cake}              => {mineral water}     0.02746300 0.3388158  0.08105586 1.4213967  206 
+[71]  {burgers}           => {green tea}         0.01746434 0.2003058  0.08718837 1.5161391  131 
+[72]  {burgers}           => {milk}              0.01786428 0.2048930  0.08718837 1.5811750  134 
+[73]  {burgers}           => {french fries}      0.02199707 0.2522936  0.08718837 1.4761733  165 
+[74]  {burgers}           => {eggs}              0.02879616 0.3302752  0.08718837 1.8378297  216 
+[75]  {burgers}           => {spaghetti}         0.02146380 0.2461774  0.08718837 1.4139177  161 
+[76]  {burgers}           => {mineral water}     0.02439675 0.2798165  0.08718837 1.1738835  183 
+[77]  {pancakes}          => {french fries}      0.02013065 0.2117812  0.09505399 1.2391348  151 
+[78]  {pancakes}          => {chocolate}         0.01986402 0.2089762  0.09505399 1.2754517  149 
+[79]  {pancakes}          => {eggs}              0.02173044 0.2286115  0.09505399 1.2721179  163 
+[80]  {pancakes}          => {spaghetti}         0.02519664 0.2650771  0.09505399 1.5224683  189 
+[81]  {pancakes}          => {mineral water}     0.03372884 0.3548387  0.09505399 1.4886159  253 
+[82]  {frozen vegetables} => {milk}              0.02359685 0.2475524  0.09532062 1.9103816  177 
+[83]  {frozen vegetables} => {french fries}      0.01906412 0.2000000  0.09532062 1.1702028  143 
+[84]  {frozen vegetables} => {chocolate}         0.02293028 0.2405594  0.09532062 1.4682151  172 
+[85]  {frozen vegetables} => {eggs}              0.02173044 0.2279720  0.09532062 1.2685595  163 
+[86]  {frozen vegetables} => {spaghetti}         0.02786295 0.2923077  0.09532062 1.6788668  209 
+[87]  {frozen vegetables} => {mineral water}     0.03572857 0.3748252  0.09532062 1.5724629  268 
+[88]  {ground beef}       => {milk}              0.02199707 0.2238806  0.09825357 1.7277041  165 
+[89]  {ground beef}       => {chocolate}         0.02306359 0.2347354  0.09825357 1.4326691  173 
+[90]  {ground beef}       => {eggs}              0.01999733 0.2035278  0.09825357 1.1325387  150 
+[91]  {ground beef}       => {spaghetti}         0.03919477 0.3989145  0.09825357 2.2911622  294 
+[92]  {spaghetti}         => {ground beef}       0.03919477 0.2251149  0.17411012 2.2911622  294 
+[93]  {ground beef}       => {mineral water}     0.04092788 0.4165536  0.09825357 1.7475215  307 
+[94]  {green tea}         => {french fries}      0.02852953 0.2159435  0.13211572 1.2634884  214 
+[95]  {green tea}         => {spaghetti}         0.02652980 0.2008073  0.13211572 1.1533348  199 
+[96]  {green tea}         => {mineral water}     0.03106252 0.2351160  0.13211572 0.9863565  233 
+[97]  {milk}              => {chocolate}         0.03212905 0.2479424  0.12958272 1.5132757  241 
+[98]  {milk}              => {eggs}              0.03079589 0.2376543  0.12958272 1.3224370  231 
+[99]  {milk}              => {spaghetti}         0.03546194 0.2736626  0.12958272 1.5717786  266 
+[100] {spaghetti}         => {milk}              0.03546194 0.2036753  0.17411012 1.5717786  266 
+[101] {milk}              => {mineral water}     0.04799360 0.3703704  0.12958272 1.5537741  360 
+[102] {mineral water}     => {milk}              0.04799360 0.2013423  0.23836822 1.5537741  360 
+[103] {french fries}      => {chocolate}         0.03439541 0.2012480  0.17091055 1.2282845  258 
+[104] {chocolate}         => {french fries}      0.03439541 0.2099268  0.16384482 1.2282845  258 
+[105] {french fries}      => {eggs}              0.03639515 0.2129485  0.17091055 1.1849606  273 
+[106] {eggs}              => {french fries}      0.03639515 0.2025223  0.17970937 1.1849606  273 
+[107] {chocolate}         => {eggs}              0.03319557 0.2026037  0.16384482 1.1273966  249 
+[108] {chocolate}         => {spaghetti}         0.03919477 0.2392189  0.16384482 1.3739516  294 
+[109] {spaghetti}         => {chocolate}         0.03919477 0.2251149  0.17411012 1.3739516  294 
+[110] {chocolate}         => {mineral water}     0.05265965 0.3213995  0.16384482 1.3483321  395 
+[111] {mineral water}     => {chocolate}         0.05265965 0.2209172  0.23836822 1.3483321  395 
+[112] {eggs}              => {spaghetti}         0.03652846 0.2032641  0.17970937 1.1674456  274 
+[113] {spaghetti}         => {eggs}              0.03652846 0.2098009  0.17411012 1.1674456  274 
+[114] {eggs}              => {mineral water}     0.05092654 0.2833828  0.17970937 1.1888447  382 
+[115] {mineral water}     => {eggs}              0.05092654 0.2136465  0.23836822 1.1888447  382 
+[116] {spaghetti}         => {mineral water}     0.05972537 0.3430322  0.17411012 1.4390851  448 
+[117] {mineral water}     => {spaghetti}         0.05972537 0.2505593  0.23836822 1.4390851  448 
+> 
+> aprioriSecondAttempt <- apriori(groceries,parameter = list(supp=0.05, conf=0.25, target = "rules", maxlen = 3))
+Apriori
+
+Parameter specification:
+ confidence minval smax arem  aval originalSupport maxtime support minlen maxlen target  ext
+       0.25    0.1    1 none FALSE            TRUE       5    0.05      1      3  rules TRUE
+
+Algorithmic control:
+ filter tree heap memopt load sort verbose
+    0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+
+Absolute minimum support count: 375 
+
+set item appearances ...[0 item(s)] done [0.00s].
+set transactions ...[119 item(s), 7501 transaction(s)] done [0.01s].
+sorting and recoding items ... [25 item(s)] done [0.00s].
+creating transaction tree ... done [0.00s].
+checking subsets of size 1 2 done [0.00s].
+writing ... [4 rule(s)] done [0.00s].
+creating S4 object  ... done [0.00s].
+> inspect(aprioriSecondAttempt)
+    lhs                rhs             support    confidence coverage  lift     count
+[1] {chocolate}     => {mineral water} 0.05265965 0.3213995  0.1638448 1.348332 395  
+[2] {eggs}          => {mineral water} 0.05092654 0.2833828  0.1797094 1.188845 382  
+[3] {spaghetti}     => {mineral water} 0.05972537 0.3430322  0.1741101 1.439085 448  
+[4] {mineral water} => {spaghetti}     0.05972537 0.2505593  0.2383682 1.439085 448  
+> 
+> aprioriThirdAttempt <- apriori(groceries,parameter = list(supp=0.50, conf=0.50, target = "rules", maxlen = 3))
+Apriori
+
+Parameter specification:
+ confidence minval smax arem  aval originalSupport maxtime support minlen maxlen target  ext
+        0.5    0.1    1 none FALSE            TRUE       5     0.5      1      3  rules TRUE
+
+Algorithmic control:
+ filter tree heap memopt load sort verbose
+    0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+
+Absolute minimum support count: 3750 
+
+set item appearances ...[0 item(s)] done [0.00s].
+set transactions ...[119 item(s), 7501 transaction(s)] done [0.00s].
+sorting and recoding items ... [0 item(s)] done [0.00s].
+creating transaction tree ... done [0.00s].
+checking subsets of size 1 done [0.00s].
+writing ... [0 rule(s)] done [0.00s].
+creating S4 object  ... done [0.00s].
+> inspect(aprioriThirdAttempt)
+> 
